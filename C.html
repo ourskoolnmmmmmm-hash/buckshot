@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <title>我的 Buckshot 計數器</title>
+    <style>
+        body { background: #1a1a1a; color: white; font-family: sans-serif; text-align: center; }
+        .counter-box { display: flex; justify-content: center; gap: 20px; margin-top: 50px; }
+        .btn { padding: 20px; font-size: 24px; cursor: pointer; border: none; border-radius: 8px; }
+        .live-btn { background: #ff4444; color: white; }
+        .blank-btn { background: #4444ff; color: white; }
+        .result { margin-top: 30px; font-size: 1.5em; }
+    </style>
+</head>
+<body>
+
+    <h1>霰彈槍機率計算器</h1>
+
+    <div class="counter-box">
+        <div>
+            <h2>實彈 (Live)</h2>
+            <button class="btn live-btn" onclick="update('live', 1)">+</button>
+            <span id="live-count" style="font-size: 30px; margin: 0 15px;">0</span>
+            <button class="btn live-btn" onclick="update('live', -1)">-</button>
+        </div>
+        <div>
+            <h2>空彈 (Blank)</h2>
+            <button class="btn blank-btn" onclick="update('blank', 1)">+</button>
+            <span id="blank-count" style="font-size: 30px; margin: 0 15px;">0</span>
+            <button class="btn blank-btn" onclick="update('blank', -1)">-</button>
+        </div>
+    </div>
+
+    <div class="result">
+        <p>下一發是實彈的機率：<span id="live-prob">0</span>%</p>
+        <p>下一發是空彈的機率：<span id="blank-prob">0</span>%</p>
+    </div>
+
+    <script>
+        let live = 0;
+        let blank = 0;
+
+        function update(type, change) {
+            if (type === 'live') live = Math.max(0, live + change);
+            if (type === 'blank') blank = Math.max(0, blank + change);
+            
+            document.getElementById('live-count').innerText = live;
+            document.getElementById('blank-count').innerText = blank;
+            
+            calculate();
+        }
+
+        function calculate() {
+            let total = live + blank;
+            let liveProb = total === 0 ? 0 : Math.round((live / total) * 100);
+            let blankProb = total === 0 ? 0 : Math.round((blank / total) * 100);
+            
+            document.getElementById('live-prob').innerText = liveProb;
+            document.getElementById('blank-prob').innerText = blankProb;
+        }
+    </script>
+</body>
+</html>
