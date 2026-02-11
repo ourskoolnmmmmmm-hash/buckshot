@@ -17,212 +17,351 @@
     .main-ui { width: 100%; max-width: 800px; padding-top: 40px; z-index: 5; }
 
     h1 { 
-        font-family: 'Bebas Neue', sans-serif; color: #8b0000; font-size: 4.5rem; 
-        letter-spacing: 10px; text-shadow: 4px 4px 6px #000; margin: 0 0 20px 0;
-        text-transform: uppercase; white-space: nowrap; 
+        font-family: 'Bebas Neue', sans-serif; color: #8b0000; font-size: 5rem; 
+        letter-spacing: 12px; text-shadow: 4px 4px 6px #000; margin: 0 0 10px 0;
+        text-transform: uppercase;
     }
 
-    .shell-container { display: flex; justify-content: center; gap: 10px; margin: 25px auto; flex-wrap: wrap; }
+    .stage { display: none; }
+    .stage.active { display: block; animation: fadeIn 0.4s ease-out; }
+    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+    /* 設定畫面 */
+    .setup-area { margin-top: 50px; }
+    .setup-title { color: #d4af37; font-family: 'Bebas Neue'; font-size: 1.8rem; margin-bottom: 30px; text-shadow: 2px 2px 2px #000; }
+
+    .ammo-row { display: flex; align-items: center; justify-content: center; margin: 25px 0; gap: 30px; }
     
+    .bullet-icon {
+        width: 60px; height: 32px; position: relative;
+        border-radius: 4px 15px 15px 4px;
+        background: #111; border: 1px solid #333;
+        box-shadow: 2px 2px 5px rgba(0,0,0,0.8);
+    }
+    .bullet-icon::before {
+        content: ''; position: absolute; left: 0; top: 0; width: 18px; height: 100%;
+        background: linear-gradient(to bottom, #443311, #aa8844 50%, #443311);
+        border-right: 1px solid #222; border-radius: 4px 0 0 4px;
+    }
+    .bullet-icon.live {
+        background: repeating-linear-gradient(45deg, #700, #800 2px, #900 4px);
+        border-color: #500;
+    }
+    .bullet-icon.blank {
+        background: repeating-linear-gradient(45deg, #1a3a5a, #204060 2px, #2a4a6a 4px);
+        border-color: #2a4a6a;
+    }
+
+    /* 戰鬥畫面的剩餘彈藥小圖示 */
+    .rem-bullet-list { display: flex; gap: 8px; justify-content: center; margin: 10px 0; min-height: 25px; }
+    .bullet-sm {
+        width: 35px; height: 18px; position: relative;
+        border-radius: 2px 8px 8px 2px;
+        border: 1px solid rgba(255,255,255,0.1);
+    }
+    .bullet-sm::before {
+        content: ''; position: absolute; left: 0; top: 0; width: 10px; height: 100%;
+        background: linear-gradient(to bottom, #443311, #aa8844 50%, #443311);
+        border-radius: 2px 0 0 2px;
+    }
+    .bullet-sm.live { background: #8b0000; border-color: #ff0000; }
+    .bullet-sm.blank { background: #1a4a8a; border-color: #3a8aff; }
+
+    .ammo-grid { display: flex; gap: 10px; }
+    
+    .ammo-slot {
+        width: 45px; height: 60px; border: 2px solid #444; background: rgba(0,0,0,0.6);
+        color: #555; cursor: pointer; display: flex; align-items: center; justify-content: center;
+        font-family: 'Bebas Neue'; font-size: 1.6rem; transition: 0.1s;
+        border-radius: 4px;
+    }
+    
+    .ammo-slot.live-selected { 
+        background: #8b0000; color: #fff; border-color: #ff4444; 
+        box-shadow: 0 0 10px rgba(255,0,0,0.3), inset 0 0 10px #000;
+    }
+    .ammo-slot.blank-selected { 
+        background: #1a4a8a; color: #fff; border-color: #3a8aff; 
+        box-shadow: 0 0 12px rgba(58,138,255,0.4), inset 0 0 10px #000;
+    }
+    
+    .action-btn { 
+        background: transparent; border: 2px solid #d4af37; color: #d4af37; 
+        margin-top: 50px; padding: 12px 45px; cursor: pointer; 
+        font-family: 'Bebas Neue', sans-serif; font-size: 1.8rem; letter-spacing: 3px;
+        text-shadow: 2px 2px 2px #000; transition: 0.2s;
+    }
+    .action-btn:hover:not(.invalid) { background: #d4af37; color: #000; box-shadow: 0 0 20px rgba(212,175,55,0.4); }
+    .action-btn.invalid { border-color: #444; color: #444; cursor: not-allowed; opacity: 0.5; }
+
+    /* 戰鬥畫面 */
+    .shell-container { display: flex; justify-content: center; gap: 12px; margin: 35px auto; flex-wrap: wrap; }
     .shell {
-        width: 42px; height: 65px; border: 2px solid #555; border-radius: 4px;
-        background: rgba(0, 0, 0, 0.4); cursor: pointer; display: flex; align-items: center;
-        justify-content: center; font-weight: bold; font-size: 20px; transition: 0.2s;
-        position: relative; color: #fff; font-family: 'Bebas Neue', sans-serif;
-        text-shadow: 1px 1px 3px #000;
+        width: 65px; height: 35px; border: 1px solid #333; border-radius: 4px 12px 12px 4px;
+        background: #1a1a1a; cursor: pointer; display: flex; align-items: center;
+        justify-content: center; font-size: 18px; transition: 0.2s;
+        position: relative; color: #444; font-family: 'Bebas Neue', sans-serif;
+        box-shadow: 2px 2px 5px rgba(0,0,0,0.5);
     }
-     
+    .shell::before {
+        content: ''; position: absolute; left: 0; width: 16px; height: 100%;
+        background: #443311; border-radius: 4px 0 0 4px; opacity: 0.6;
+    }
+
     .shell.current { 
-        border-color: #d4af37; 
-        color: #fff; 
+        border: 2px solid #d4af37; 
         transform: scale(1.15); 
-        z-index: 10;
-        animation: real-breathing 3s ease-in-out infinite;
-        outline: 1px solid rgba(212, 175, 55, 0.3); 
+        z-index: 10; 
+        animation: yellowBreathing 4s ease-in-out infinite; 
     }
-
-    .shell.current::after { 
-        content: '▲'; position: absolute; bottom: -22px; color: #d4af37; font-size: 12px; 
-        animation: arrow-bounce 1.5s infinite ease-in-out;
-    }
-
-    @keyframes arrow-bounce {
-        0%, 100% { transform: translateY(0); opacity: 0.5; }
-        50% { transform: translateY(-5px); opacity: 1; }
-    }
-
-    .shell.live { 
-        background: #8b0000; border-color: #ff0000; color: #fff; 
-        box-shadow: inset 0 0 12px rgba(255, 0, 0, 0.4);
-    }
-    .shell.blank { 
-        background: #001f3f; border-color: #0074d9; color: #fff; 
-        box-shadow: inset 0 0 12px rgba(0, 116, 217, 0.4);
-    }
-
-    @keyframes real-breathing {
-        0%, 100% {
-            box-shadow: 0 0 5px rgba(212, 175, 55, 0.3);
-            border-color: rgba(212, 175, 55, 0.5);
-        }
-        50% {
-            box-shadow: 
-                0 0 15px rgba(212, 175, 55, 0.8), 
-                0 0 30px rgba(212, 175, 55, 0.4), 
-                inset 0 0 15px rgba(255, 215, 0, 0.5); 
-            border-color: rgba(255, 215, 0, 1);
-        }
-    }
-
-    .track-controls { 
-        margin: 20px 0; display: flex; justify-content: center; gap: 15px; 
-        align-items: center; background: transparent; padding: 10px 20px; 
-        text-shadow: 2px 2px 2px #000, -1px -1px 1px #000, 1px -1px 1px #000, -1px 1px 1px #000;
-    }
-    .nav-btn { background: rgba(0,0,0,0.5); color: #d4af37; border: 1px solid #d4af37; padding: 5px 15px; cursor: pointer; font-family: 'Bebas Neue', sans-serif; }
-
-    .counter-box { display: flex; justify-content: center; gap: 40px; margin-top: 20px; background: transparent; }
-    .counter-box p { text-shadow: 2px 2px 2px #000, -1px -1px 0px #000, 1px -1px 0px #000, -1px 1px 0px #000; }
-
-    #live-count, #blank-count { font-family: 'Bebas Neue', sans-serif; font-size: 45px; margin: 0 15px; color: #fff; vertical-align: middle; text-shadow: 2px 2px 4px #000; }
-
-    .btn { width: 50px; height: 50px; font-size: 24px; cursor: pointer; border: none; border-radius: 4px; font-family: 'Bebas Neue', sans-serif; box-shadow: 2px 2px 5px #000; }
-    .live-btn { background: #8b0000; color: #fff; }
-    .blank-btn { background: #001f3f; color: #fff; }
-
-    .result { margin-top: 30px; background: transparent; padding: 15px; font-family: 'Bebas Neue', sans-serif; text-shadow: 2px 2px 2px #000, -1px -1px 1px #000; }
     
-    .highlight { 
-        font-weight: bold; color: #d4af37; font-size: 2.5rem; 
-        text-shadow: 0 0 8px #000; 
-        animation: text-breathing 3s ease-in-out infinite;
+    @keyframes yellowBreathing {
+        0%, 100% { box-shadow: 0 0 8px rgba(212,175,55,0.4); border-color: #d4af37; }
+        50% { box-shadow: 0 0 35px rgba(212,175,55,0.8), 0 0 10px #fff; border-color: #fff; }
     }
 
-    @keyframes text-breathing {
-        0%, 100% { text-shadow: 0 0 8px rgba(0, 0, 0, 0.8), 0 0 5px rgba(212, 175, 55, 0.2); }
-        50% { 
-            text-shadow: 0 0 10px rgba(0, 0, 0, 1), 0 0 20px rgba(212, 175, 55, 1), 0 0 35px rgba(212, 175, 55, 0.6);
-            color: #fff2a8;
-        }
+    .shell.live { background: #8b0000; border-color: #ff0000; color: #fff; }
+    .shell.live::before { background: #aa8844; opacity: 1; }
+    
+    .shell.blank { background: #1a4a8a; border-color: #3a8aff; color: #fff; }
+    .shell.blank::before { background: #666; opacity: 1; }
+    
+    .track-controls { margin: 20px 0; display: flex; justify-content: center; gap: 25px; align-items: center; }
+    .nav-btn { background: rgba(0,0,0,0.5); color: #d4af37; border: 1px solid #d4af37; padding: 5px 20px; cursor: pointer; font-family: 'Bebas Neue'; font-size: 1.5rem; }
+    
+    .shot-display { 
+        font-family: 'Bebas Neue'; letter-spacing: 4px; color: #8b0000; font-size: 2.8rem;
+        text-shadow: 2px 2px 4px #000;
     }
-    .reset-btn { background: rgba(0,0,0,0.3); border: 1px solid #444; color: #fff; margin: 30px 0; padding: 8px 16px; cursor: pointer; font-family: 'Bebas Neue', sans-serif; text-shadow: 1px 1px 2px #000; }
+
+    .highlight { 
+        font-weight: bold; color: #8b0000; font-size: 4rem; 
+        text-shadow: 0 0 15px rgba(139,0,0,0.6); 
+    }
+
+    .status-panel { margin-top: 20px; font-family: 'Bebas Neue'; }
+
+    /* 底部按鈕區 */
+    .footer-btns { display: flex; justify-content: center; gap: 20px; margin-top: 20px; }
+    .footer-btn { 
+        background: transparent; border: 2px solid #444; color: #888; 
+        padding: 8px 25px; cursor: pointer; font-family: 'Bebas Neue'; 
+        font-size: 1.2rem; transition: 0.2s;
+    }
+    .footer-btn:hover { border-color: #d4af37; color: #d4af37; }
+    .footer-btn.reset-btn:hover { border-color: #ff4444; color: #ff4444; }
+
 </style>
 </head>
 <body>
 
     <div class="main-ui">
-        <h1>Buckshot Counter</h1>
-        <div class="shell-container" id="shell-track"></div>
-        <div class="track-controls">
-            <button class="nav-btn" onclick="movePointer(-1)">←</button>
-            <div>當前發數(Space) <span id="curr-num" class="highlight" style="font-size: 1.5rem;">1</span></div>
-            <button class="nav-btn" onclick="movePointer(1)">→</button>
-        </div>
-        <div class="counter-box">
-            <div>
-                <p style="color: #ff4444; margin: 5px; font-weight: bold;">實彈 (Q-A)</p>
-                <button class="btn live-btn" onclick="update('live', 1)">+</button>
-                <span id="live-count">0</span>
-                <button class="btn live-btn" onclick="update('live', -1)">-</button>
-            </div>
-            <div>
-                <p style="color: #44aaff; margin: 5px; font-weight: bold;">空彈 (E-D)</p>
-                <button class="btn blank-btn" onclick="update('blank', 1)">+</button>
-                <span id="blank-count">0</span>
-                <button class="btn blank-btn" onclick="update('blank', -1)">-</button>
+        <h1>High Roller</h1>
+
+        <div id="setup-stage" class="stage active">
+            <div class="setup-area">
+                <div class="setup-title">彈藥數量</div>
+                
+                <div class="ammo-row">
+                    <div class="bullet-icon live"></div>
+                    <div class="ammo-grid" id="live-selector"></div>
+                </div>
+
+                <div class="ammo-row">
+                    <div class="bullet-icon blank"></div>
+                    <div class="ammo-grid" id="blank-selector"></div>
+                </div>
+
+                <button id="start-btn" class="action-btn invalid" onclick="startCombat()">Shootin' dice with Jesus Christ</button>
             </div>
         </div>
-        <div class="result">
-            <p>實彈機率: <span id="live-prob" class="highlight">--</span> %</p>
-            <p>空彈機率: <span id="blank-prob" class="highlight">--</span> %</p>
+
+        <div id="combat-stage" class="stage">
+            <div class="shell-container" id="shell-track"></div>
+            
+            <div class="track-controls">
+                <button class="nav-btn" onclick="movePointer(-1)">←</button>
+                <div class="shot-display">SHOT <span id="curr-num">1</span></div>
+                <button class="nav-btn" onclick="movePointer(1)">→</button>
+            </div>
+
+            <div class="status-panel">
+                <div id="live-rem-icons" class="rem-bullet-list"></div>
+                <div id="blank-rem-icons" class="rem-bullet-list"></div>
+                <div style="font-family: 'Bebas Neue'; font-size: 4rem; margin-top: 10px;">
+                    SMOKE: <span id="live-prob" class="highlight">--</span><span id="prob-percent" style="color:#8b0000; font-size: 4rem; font-weight: bold;">%</span>
+                </div>
+            </div>
+
+            <div class="footer-btns">
+                <button class="footer-btn reset-btn" onclick="resetCurrentTrack()">Reset [X]</button>
+                <button class="footer-btn" onclick="reload()">Reload [R]</button>
+            </div>
         </div>
-        <button class="reset-btn" onclick="reset()">RESET (R)</button>
     </div>
 
     <script>
-        let live = 0, blank = 0, currentIndex = 0;
-        
-        function createShells() {
-            const track = document.getElementById('shell-track');
-            track.innerHTML = '';
-            for (let i = 0; i < 8; i++) {
-                const s = document.createElement('div');
-                s.className = 'shell';
-                if (i === currentIndex) s.classList.add('current');
-                s.innerText = i + 1;
-                
-                s.onclick = function() {
-                    if (this.classList.contains('live')) { 
-                        this.classList.remove('live'); this.classList.add('blank'); 
-                    }
-                    else if (this.classList.contains('blank')) { 
-                        this.classList.remove('blank'); 
-                    }
-                    else { 
-                        this.classList.add('live'); 
-                    }
-                };
-                track.appendChild(s);
+        let initLive = 0, initBlank = 0;
+        let currentLive = 0, currentBlank = 0;
+        let currentIndex = 0;
+        let shellStates = [];
+
+        function initSelectors() {
+            const liveGrid = document.getElementById('live-selector');
+            const blankGrid = document.getElementById('blank-selector');
+            liveGrid.innerHTML = ''; blankGrid.innerHTML = '';
+
+            for(let i=1; i<=8; i++) {
+                const lBtn = document.createElement('div');
+                lBtn.className = 'ammo-slot';
+                lBtn.innerText = i;
+                lBtn.onclick = () => selectAmmo('live', i);
+                lBtn.id = `l-${i}`;
+                liveGrid.appendChild(lBtn);
+
+                const bBtn = document.createElement('div');
+                bBtn.className = 'ammo-slot';
+                bBtn.innerText = i;
+                bBtn.onclick = () => selectAmmo('blank', i);
+                bBtn.id = `b-${i}`;
+                blankGrid.appendChild(bBtn);
             }
         }
 
-        function movePointer(dir) {
-            currentIndex = (currentIndex + dir + 8) % 8;
-            document.getElementById('curr-num').innerText = currentIndex + 1;
-            const shells = document.querySelectorAll('.shell');
-            shells.forEach((s, i) => s.classList.toggle('current', i === currentIndex));
-        }
-
-        // 核心邏輯修正：確保 live + blank 總數不超過 8
-        function update(type, change) {
-            let total = live + blank;
-            
+        function selectAmmo(type, num) {
             if (type === 'live') {
-                if (change > 0) {
-                    if (total < 8) live++; 
-                } else {
-                    live = Math.max(0, live - 1);
-                }
+                initLive = (initLive === num) ? 0 : num;
+            } else {
+                initBlank = (initBlank === num) ? 0 : num;
             }
-            
-            if (type === 'blank') {
-                if (change > 0) {
-                    if (total < 8) blank++;
-                } else {
-                    blank = Math.max(0, blank - 1);
-                }
+            updateSelectorUI();
+        }
+
+        function updateSelectorUI() {
+            for(let i=1; i<=8; i++) {
+                const l = document.getElementById(`l-${i}`);
+                const b = document.getElementById(`b-${i}`);
+                l.className = (i <= initLive) ? 'ammo-slot live-selected' : 'ammo-slot';
+                b.className = (i <= initBlank) ? 'ammo-slot blank-selected' : 'ammo-slot';
             }
 
-            document.getElementById('live-count').innerText = live;
-            document.getElementById('blank-count').innerText = blank;
+            const startBtn = document.getElementById('start-btn');
+            if (initLive > 0 && initBlank > 0) {
+                startBtn.classList.remove('invalid');
+            } else {
+                startBtn.classList.add('invalid');
+            }
+        }
+
+        function startCombat() {
+            if (initLive === 0 || initBlank === 0) return;
+            resetCurrentTrack(); // 初始化戰鬥數據
+            document.getElementById('setup-stage').classList.remove('active');
+            document.getElementById('combat-stage').classList.add('active');
+            createShells();
+        }
+
+        // 新增：僅重置目前這局的子彈狀態，不退回首頁
+        function resetCurrentTrack() {
+            currentLive = initLive;
+            currentBlank = initBlank;
+            currentIndex = 0;
+            shellStates = Array(initLive + initBlank).fill('unknown');
+            updateShellVisuals();
             calculate();
         }
 
-        function calculate() {
-            let total = live + blank;
-            document.getElementById('live-prob').innerText = total === 0 ? "--" : Math.round((live/total)*100);
-            document.getElementById('blank-prob').innerText = total === 0 ? "--" : Math.round((blank/total)*100);
+        function createShells() {
+            const track = document.getElementById('shell-track');
+            track.innerHTML = '';
+            shellStates.forEach((state, i) => {
+                const s = document.createElement('div');
+                s.className = 'shell';
+                s.innerText = i + 1;
+                s.onclick = () => toggleShell(i);
+                track.appendChild(s);
+            });
+            updateShellVisuals();
         }
 
-        function reset() {
-            live = 0; blank = 0; currentIndex = 0;
-            document.getElementById('live-count').innerText = 0;
-            document.getElementById('blank-count').innerText = 0;
-            document.getElementById('curr-num').innerText = 1;
-            createShells(); calculate();
+        function toggleShell(idx) {
+            const state = shellStates[idx];
+            if (state === 'unknown') {
+                if (currentLive > 0) { shellStates[idx] = 'live'; currentLive--; }
+                else if (currentBlank > 0) { shellStates[idx] = 'blank'; currentBlank--; }
+            } else if (state === 'live') {
+                currentLive++;
+                if (currentBlank > 0) { shellStates[idx] = 'blank'; currentBlank--; }
+                else { shellStates[idx] = 'unknown'; }
+            } else {
+                currentBlank++;
+                shellStates[idx] = 'unknown';
+            }
+            updateShellVisuals();
+            calculate();
+        }
+
+        function updateShellVisuals() {
+            const shells = document.querySelectorAll('.shell');
+            shells.forEach((s, i) => {
+                s.classList.remove('live', 'blank', 'current');
+                if (shellStates[i] === 'live') s.classList.add('live');
+                if (shellStates[i] === 'blank') s.classList.add('blank');
+                if (i === currentIndex) s.classList.add('current');
+            });
+            
+            const liveContainer = document.getElementById('live-rem-icons');
+            const blankContainer = document.getElementById('blank-rem-icons');
+            liveContainer.innerHTML = '';
+            blankContainer.innerHTML = '';
+
+            for(let i=0; i<currentLive; i++) {
+                const b = document.createElement('div');
+                b.className = 'bullet-sm live';
+                liveContainer.appendChild(b);
+            }
+            for(let i=0; i<currentBlank; i++) {
+                const b = document.createElement('div');
+                b.className = 'bullet-sm blank';
+                blankContainer.appendChild(b);
+            }
+
+            document.getElementById('curr-num').innerText = currentIndex + 1;
+        }
+
+        function movePointer(dir) {
+            const total = initLive + initBlank;
+            if(total === 0) return;
+            currentIndex = (currentIndex + dir + total) % total;
+            updateShellVisuals();
+        }
+
+        function calculate() {
+            let totalRemaining = currentLive + currentBlank;
+            document.getElementById('live-prob').innerText = totalRemaining === 0 ? "0" : Math.round((currentLive/totalRemaining)*100);
+        }
+
+        // 退回初始設定畫面
+        function reload() {
+            initLive = 0; initBlank = 0;
+            initSelectors();
+            document.getElementById('combat-stage').classList.remove('active');
+            document.getElementById('setup-stage').classList.add('active');
         }
 
         document.addEventListener('keydown', (e) => {
             const key = e.key.toUpperCase();
-            if (key === 'Q') update('live', 1); if (key === 'A') update('live', -1);
-            if (key === 'E') update('blank', 1); if (key === 'D') update('blank', -1);
-            if (key === 'R') reset(); if (key === 'ARROWLEFT') movePointer(-1);
-            if (key === 'ARROWRIGHT' || key === ' ') { e.preventDefault(); movePointer(1); }
+            if (document.getElementById('setup-stage').classList.contains('active')) {
+                if (key === 'ENTER') startCombat();
+            } else {
+                if (key === 'R') reload(); 
+                if (key === 'X') resetCurrentTrack(); // 快速鍵 X 重置目前這局
+                if (key === 'ARROWLEFT') movePointer(-1);
+                if (key === 'ARROWRIGHT' || key === ' ') { e.preventDefault(); movePointer(1); }
+            }
         });
 
-        createShells();
+        initSelectors();
     </script>
 </body>
-
 </html>
-
